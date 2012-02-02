@@ -1,0 +1,50 @@
+<?php
+// Load fedora_item.inc from the fedora_repository module in the api folder.
+// module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+/**
+ * Implementation of hook_nodeapi().
+ */
+function islandora_upload_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
+	  switch ($op) {
+		case 'delete':
+		  //replace this with function call for Object Deletion
+		  drupal_set_message(t('Delete Action.'));
+		  db_query("DELETE FROM {node_fedora_objects} where NID = '".$node->nid."'");
+		  break;
+		case 'insert':
+			//replace this with function call for Object Insertion
+			
+			//db_query("INSERT INTO {node_fedora_objects} (NID, PID) VALUES (%d, %d)", $node->nid, "232");
+			db_query("INSERT INTO {node_fedora_objects} (NID,PID) VALUES ('".$node->nid."','2555')");
+			 break;
+		case 'update':
+			//replace this with function call node updation
+			islandora_upload_remove_fedora_obejects($node);
+			//drupal_set_message(t('Update Action.'));
+			
+		  break;
+	  }
+}
+
+function islandora_upload_remove_fedora_obejects($node) {
+
+	$sql = "SELECT PID FROM {node_fedora_objects} WHERE NID = '".$node->nid."'";
+	$results = db_query($sql); // Run the query
+	while ($PID = db_result($results)) { // Get the next result, which will/must always be a single field
+	  $fedora_item = new Fedora_Item($PID);
+	  drupal_set_message(t($fedora_item->exists()));
+	}
+}
+
+/**
+ * Implementation of hook_help()
+ */
+function islandora_upload_help($path, $arg) {
+  if ($path == 'admin/help#islandora_upload') {
+	$txt = 'This module is used to sync Drupal Nodes and Fedora Objects.';
+	$replace = array();
+	return '<p>'. t($txt, $replace) .'</p>';
+  }
+}
+
+?>

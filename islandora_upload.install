@@ -1,22 +1,28 @@
 <?php
 /**
-* Implementation of Schema
-*/
+ * @file
+ * Install and uninstall functions for the islandora_upload module.
+ *
+ */
+
+/**
+ * Implementation of Schema
+ */
 function islandora_upload_schema() {
   $schema['node_fedora_objects'] = array(
-    'description' => 'Stores Fedora Objects link of defined {node}.', 
+    'description' => 'Stores Fedora Objects link of defined {node}.',
     'fields' => array(
-	  'NID' => array(
-        'description' => 'The Node ID.', 
-        'type' => 'int',  
-        'unsigned' => TRUE, 
-        'length' => 11, 
+      'nid' => array(
+        'description' => 'The Node ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 11,
         'not null' => TRUE,
       ),
-      'PID' => array(
-        'description' => 'The PID of Fedora Objects attached to NID.', 
-        'type' => 'varchar', 
-        'length' => 64, 
+      'pid' => array(
+        'description' => 'The PID of Fedora Objects attached to NID.',
+        'type' => 'varchar',
+        'length' => 64,
         'not null' => TRUE,
       ),
     ),
@@ -39,6 +45,3 @@ function islandora_upload_uninstall() {
   //Drop Tables
   drupal_uninstall_schema('islandora_upload');
 }
-  
-
-?>

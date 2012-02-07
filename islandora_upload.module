@@ -57,13 +57,18 @@ function islandora_upload_delete_fedora_objects($node, $uid) {
     $fedora_item = new Fedora_Item($PID);
     //check to see if the fedora object exists, if exists 1 is returned.
     if  ($fedora_item->exists())  {
-      $state = 'D'; //Set the object to deleted
-      $dsid = $PID; //I think this is distinct identifier
-      $log_message = "Node {NID:" . $node->nid . "} created by {UID:" . $node->uid . "} which is associate with this object has been deleted by user {" . $uid . "}.";
-      $fedora_item->set_datastream_state($dsid, $state, $log_message);
+
+      echo"<pre>";
+      print_r($fedora_item->get_datastreams_list_as_array());
+      echo"</pre>";
+      die;
+     // $state = 'D'; //Set the object to deleted
+     // $dsid = $PID; //I think this is distinct identifier
+      //$log_message = "Node {NID:" . $node->nid . "} created by {UID:" . $node->uid . "} which is associate with this object has been deleted by user {" . $uid . "}.";
+      //$fedora_item->set_datastream_state($dsid, $state, $log_message);
     }
   }
-  db_query("DELETE FROM {node_fedora_objects} where nid = '" . $node->nid . "'");
+ // db_query("DELETE FROM {node_fedora_objects} where nid = '" . $node->nid . "'");
 }
 /**
  * When a Drupal Node is deleted this function will purge

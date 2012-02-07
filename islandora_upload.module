@@ -9,26 +9,31 @@
 
 // Load fedora_item.inc from the fedora_repository module in the api folder.
 module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+
 /**
  * Implementation of hook_nodeapi().
  */
 function islandora_upload_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
-
+global $user;
   switch  ($op)  {
     case  'delete':
-      islandora_upload_remove_fedora_obejects($node);
+      // if user has permission user purge else use delete
+      islandora_upload_delete_fedora_objects($node, $user->uid);
       break;
 
     case  'insert':
       //need to grab all files attached to node
       //db_query("INSERT INTO {node_fedora_objects} (NID, PID) VALUES (%d, %d)", $node->nid, "232");
       db_query("INSERT INTO {node_fedora_objects} (nid,pid) VALUES ('" . $node->nid . "','2555')");
-    break;
+      break;
 
     case  'update':
-    //replace this with function call node updation
-    //drupal_set_message(t('Update Action.'));
-    break;
+      break;
+
+    case 'validate':
+      //check file mimes?
+      //use form_set_error().
+      break;
   }
 }
 
@@ -38,9 +43,11 @@ function islandora_upload_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
  *
  * @param $node
  *   A node object.
+ * @param $uid
+ *   The current User ID. (This is the user deleting the node)
  *
  */
-function islandora_upload_remove_fedora_obejects($node) {
+function islandora_upload_delete_fedora_objects($node, $uid) {
 
   //Grab all pid attached to the drupal node
   $sql = "SELECT pid FROM {node_fedora_objects} WHERE nid = '" . $node->nid . "'";
@@ -50,15 +57,36 @@ function islandora_upload_remove_fedora_obejects($node) {
     $fedora_item = new Fedora_Item($PID);
     //check to see if the fedora object exists, if exists 1 is returned.
     if  ($fedora_item->exists())  {
-      //Can be used if we go the XACML route
-      /*
-        $log_message = "Purge of object since the node it was attached to has been deleted.";
-        $fedora_item->purge($log_message, TRUE); //remove the fedora object
-      */
       $state = 'D'; //Set the object to deleted
       $dsid = $PID; //I think this is distinct identifier
-      $log_message = "Node {NID:" . $node->nid . "} associate with this object has been deleted and user doesn't have permission to purge so object is set to deleted.";
+      $log_message = "Node {NID:" . $node->nid . "} created by {UID:" . $node->uid . "} which is associate with this object has been deleted by user {" . $uid . "}.";
       $fedora_item->set_datastream_state($dsid, $state, $log_message);
+    }
+  }
+  db_query("DELETE FROM {node_fedora_objects} where nid = '" . $node->nid . "'");
+}
+/**
+ * When a Drupal Node is deleted this function will purge
+ * all associated Fedora Objects
+ *
+ * @param $node
+ *   A node object.
+ * @param $uid
+ *   The current User ID. (This is the user deleting the node)
+ *
+ */
+function islandora_upload_purge_fedora_objects($node, $uid) {
+
+  //Grab all pid attached to the drupal node
+  $sql = "SELECT pid FROM {node_fedora_objects} WHERE nid = '" . $node->nid . "'";
+  $results = db_query($sql);
+
+  while ($PID = db_result($results)) { // Get the next result, which will/must always be a single field
+    $fedora_item = new Fedora_Item($PID);
+    //check to see if the fedora object exists, if exists 1 is returned.
+    if  ($fedora_item->exists())  {
+      $log_message = "Node {NID:" . $node->nid . "} created by {UID:" . $node->uid . "} which is associate with this object has been purged by user {" . $uid . "}.";
+      $fedora_item->purge($log_message, TRUE); //remove the fedora object
     }
   }
   db_query("DELETE FROM {node_fedora_objects} where nid = '" . $node->nid . "'");
@@ -73,5 +101,9 @@ function islandora_upload_help($path, $arg) {
     $replace  =  array();
     return  '<p>' . t($txt, $replace) . '</p>';
   }
+}
+
+function islandora_upload_form_alter(&$form, $form_state, $form_id) {
+
 }
 

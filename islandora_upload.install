@@ -27,6 +27,25 @@ function islandora_upload_schema() {
       ),
     ),
   );
+  $schema['upload_files'] = array(
+    'description' => 'Stores Fedora Objects link of defined {node}.',
+    'fields' => array(
+      'fid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Primary Key: The {files}.fid.',
+      ),
+      'nid' => array(
+        'description' => 'The Node ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+    ),
+  );
   return $schema;
 }
 /**

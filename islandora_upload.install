@@ -9,6 +9,10 @@
  * Implementation of Schema
  */
 function islandora_upload_schema() {
+  /**
+  * islandora_attach_files Table
+  * Used to temporarily store all files attached to a node
+  */
   $schema['attach_files'] = array(
     'description' => 'Stores uploaded file information and table associations.',
     'fields' => array(
@@ -62,7 +66,10 @@ function islandora_upload_schema() {
       'nid' => array('nid'),
     ),
   );
-
+  /**
+  * node_fedora_objects Table
+  * Used to join Fedora Objects with Nodes using PID and the NID
+  */
   $schema['node_fedora_objects'] = array(
     'description' => 'Stores Fedora Objects link of defined {node}.',
     'fields' => array(
@@ -79,9 +86,121 @@ function islandora_upload_schema() {
         'length' => 64,
         'not null' => TRUE,
       ),
+      'ownerid' => array(
+        'description' => 'The UID that created the node/object.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'fid' => array(
+        'description' => 'The File ID.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 11,
+        'not null' => TRUE,
+      ),
     ),
   );
-
+  /**
+  * islandora_attachment_permissions Table
+  * Used to set permissions on a per file bases
+  * can be public, private, group, or by user.
+  */
+  $schema['islandora_attachment_permissions'] = array(
+    'description' => 'Stores Access permissions for each Fedora Object.',
+    'fields' => array(
+      'iapid' => array(
+        'description' => 'The table autoincrement ID.',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'public_permission' => array(
+        'description' => 'Boolean representation of if the permission is set to public or not using 0 or 1.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => 1,
+      ),
+      'private_permission' => array(
+        'description' => 'Boolean representation of if the permission is set to private or not using 0 or 1.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 1,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'pid' => array(
+        'description' => 'The PID of Fedora Objects that the permissions are for.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => TRUE,
+      ),
+    ),
+    'primary key' => array('iapid'),
+  );
+  /**
+  * islandora_attachment_permission_users Table
+  * If Permission base on file is by user this table
+  * stores the {islandora_attachment_permissions} ID (iapid)
+  * and the User ID that can access it, if there are multiple users
+  * there will be multiple table entries.  Example iapid = 1
+  * permission for uid = 1 and uid = 5 there are then two records created
+  * ubid: 1 - uid: 1 AND  ubid: 1 - uid: 5.
+  * ubid = User Binding ID
+  */
+  $schema['islandora_attachment_permission_users'] = array(
+    'description' => 'If permission is drupal user based this table is used to store users that can access objects linked to {islandora_attachment_permissions} by ID.',
+    'fields' => array(
+      'ubid' => array(
+        'description' => 'The ubid is the {islandora_attachment_permissions} ID (iapid).',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'uid' => array(
+        'description' => 'A UID that has access permission.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+    ),
+  );
+  /**
+  * islandora_attachment_permission_groups Table
+  * If Permission base on file is by group this table
+  * stores the {islandora_attachment_permissions} ID (iapid)
+  * and the Group ID that can access it, if there are multiple groups
+  * there will be multiple table entries.  Example iapid = 1
+  * permission for gid = 15 and gid = 7 there are then two records created
+  * ubid: 1 - gid: 7 AND  ubid: 1 - gid: 15.
+  * Note: rid = Role ID
+  * rbid = Role Binding ID
+  */
+  $schema['islandora_attachment_permission_roles'] = array(
+    'description' => 'If permission is drupal group based this table is used to store groups that can access objects.',
+    'fields' => array(
+      'rbid' => array(
+        'description' => 'The rbid is the {islandora_attachment_permissions} ID (iapid).',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+      'rid' => array(
+        'description' => 'The Role ID that has access permission.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'length' => 11,
+        'not null' => TRUE,
+      ),
+    ),
+  );
   return $schema;
 }
 /**

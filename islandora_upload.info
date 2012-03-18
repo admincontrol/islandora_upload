@@ -1,4 +1,5 @@
 name = Islandora Uploader
 description = Syncing Drupal Nodes to Fedora Objects.
+dependencies[] = fedora_repository
 core = 6.x
-version = 6.22
+version = 1

@@ -9,63 +9,7 @@
  * Implementation of Schema
  */
 function islandora_upload_schema() {
-  /**
-  * islandora_attach_files Table
-  * Used to temporarily store all files attached to a node
-  */
-  $schema['attach_files'] = array(
-    'description' => 'Stores uploaded file information and table associations.',
-    'fields' => array(
-      'fid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Primary Key: The {files}.fid.',
-      ),
-      'nid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'The {node}.nid associated with the uploaded file.',
-      ),
-      'vid' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Primary Key: The {node}.vid associated with the uploaded file.',
-      ),
-      'description' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'Description of the uploaded file.',
-      ),
-      'list' => array(
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'tiny',
-        'description' => 'Whether the file should be visibly listed on the node: yes(1) or no(0).',
-      ),
-      'weight' => array(
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'size' => 'tiny',
-        'description' => 'Weight of this upload in relation to other uploads in this node.',
-      ),
-    ),
-    'primary key' => array('vid', 'fid'),
-    'indexes' => array(
-      'fid' => array('fid'),
-      'nid' => array('nid'),
-    ),
-  );
+
   /**
   * node_fedora_objects Table
   * Used to join Fedora Objects with Nodes using PID and the NID

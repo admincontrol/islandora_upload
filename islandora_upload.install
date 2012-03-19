@@ -147,14 +147,62 @@ function islandora_upload_schema() {
   );
   return $schema;
 }
+/*
+ * Installing content model
+ */
+function generic_content_model() {
+  // add content model
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  module_load_include('inc', 'fedora_repository', 'api/dublin_core');
+  module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
+  define("FEDORA_MODEL_URI", 'info:fedora/fedora-system:def/model#');
+  try {
+    $temp_item=new Fedora_Item('islandora:generic_CM');
+    if (!$temp_item->exists()) {
+      $new_item = Fedora_Item::ingest_new_item('islandora:generic_CM', 'A', 'Generic Content Model');
+      $new_item->add_relationship('hasModel', 'fedora-system:ContentModel-3.0', FEDORA_MODEL_URI);
+      $new_item->add_datastream_from_file(drupal_get_path('module', 'islandora_upload') . '/xml/GENERIC_CMODEL.xml', 'ISLANDORACM', 'Islandora Content Model.xml', 'application/xml', 'X');
+    }
+  }
+  catch (exception $e) {
+    drupal_set_message(check_plain('Content Model error' . $e), 'status');
+  }
+}
+
+/**
+ * Create the Generic Collection
+ */
+function generic_collection() {
+  module_load_include('inc', 'fedora_repository', 'api/fedora_item');
+  module_load_include('inc', 'fedora_repository', 'api/dublin_core');
+  module_load_include('inc', 'fedora_repository', 'api/fedora_utils');
+  define("FEDORA_MODEL_URI", 'info:fedora/fedora-system:def/model#');
+  try {
+    $temp_item=new Fedora_Item('islandora:Generic_Collection');
+    if (!$temp_item->exists()) {
+      $new_item = fedora_item::ingest_new_item('islandora:Generic_Collection', 'A', 'Islandora Generic Upload Collection');
+      $new_item->add_relationship('hasModel', 'islandora:generic_CM', FEDORA_MODEL_URI);
+      $new_item->add_relationship('isMemberOfCollection', 'islandora:root');
+      $new_item->add_datastream_from_file(drupal_get_path('module', 'islandora_upload') . '/xml/GENERIC-COLLECTION_POLICY.xml', 'COLLECTION_POLICY', 'Collection Policy', 'text/xml', 'X');
+      $new_item->add_datastream_from_file(drupal_get_path('module', 'islandora_upload') . '/images/Crystal_Clear_filesystem_folder_grey.png', 'TN', 'Thumbnail.png', 'image/png', 'M');
+    }
+  }
+  catch (exception $e) {
+    drupal_set_message(check_plain('Collection error'. $e), 'status');
+  }
+}
+
 /**
  * Implementation of hook_install().
  */
 function islandora_upload_install() {
   // Create table
   drupal_install_schema('islandora_upload');
+  // create the generic content model if it doesnt exist
+  generic_content_model();
+  // create the generic collection if it doenst exist
+  generic_collection();
 }
-
 
 /**
  * Implementation of hook_uninstall().

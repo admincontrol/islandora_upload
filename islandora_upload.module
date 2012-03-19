@@ -803,7 +803,8 @@ function islandora_upload_save(&$node, $uid) {
       // IMPORTANT NOTE: THE OBJ AND PID LABEL SHOULD ALWAYS MATCH
       $fedora_item = Fedora_Item::ingest_new_item(Fedora_Item::get_next_PID_in_namespace("islandora"), 'A', $file->description, $user->name);
       $fedora_item->add_datastream_from_file($file->filepath, "OBJ", $file->filename);
-      $fedora_item->add_relationship("fedora:isMemberOfCollection", "islandora:sp_generic_collection");
+      $fedora_item->add_relationship("fedora:isMemberOfCollection", "islandora:Generic_Collection");
+      $fedora_item->add_relationship('hasModel', 'islandora:generic_CM', 'info:fedora/fedora-system:def/model#');
 
       array_push($new_pids, $fedora_item->pid);
     }
@@ -864,7 +865,7 @@ function islandora_check_mime($file) {
   if (!empty($file)) {
   // Grabs the default list of extensions currently defined
   // in islandora_upload.admin.inc
-  $extensions = variable_get('islandoraupload_extensions_default', 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp');
+  $extensions = variable_get('islandoraupload_extensions_default', '3dm 3dmf a aab aam aas abc acgi afl ai aif aifc aiff aim aip ani aos aps arc arj art asf asm asp asx au avi avs bcpio bin bm bmp boo book boz bsh bz bz2 c c++ cat cc ccad cco cdf cer cha chat class com conf cpio cpp cpt crl crt csh csh css cxx dcr deepv def der dif dir dl doc dot dp drw dump dv dvi dwf dwg dxf dxr el elc env eps es etx evy exe f f77 f90 fdf fif fli flo flx fmf for fpx frl funk g g3 gif gl gsd gsm gsp gss gtar gz gzip h hdf help hgl hh hlb hlp hpg hpgl hqx hta htc htm html htmls htt htx ice ico idc ief iefs iges igs ima imap inf ins ip isu it iv ivr ivy jam jav java jcm jfif jfif-tbnl jpe jpeg jpg jps js jut kar ksh la lam latex lha lhx list lma log lsp lst lsx ltx lzh lzx m m1v m2a m2v m3u man map mar mbd mc$ mcd mcf mcp me mht mhtml mid midi mif mime mjf mjpg mm mme mod moov mov movie mp2 mp3 mpa mpc mpe mpeg mpg mpga mpp mpt mpv mpx mrc ms mv my mzz nap naplps nc ncm nif niff nix nsc nvd o oda omc omcd omcr p p10 p12 p7a p7c p7m p7r p7s part pas pbm pcl pct pcx pdb pdf pfunk pgm pic pict pkg pko pl plx pm pm4 pm5 png pnm pot pov ppa ppm pps ppt ppz pre prt ps psd pvu pwz py pyc qcp qd3 qd3d qif qt qtc qti qtif ra ram ras rast rexx rf rgb rm rmi rmm rmp rng rnx roff rp rpm rt rtf rtx rv s s3m saveme sbk scm sdml sdp sdr sea set sgm sgml sh shar shtml sid sit skd skm skp skt sl smi smil snd sol spc spl spr sprite src ssi ssm sst step stl stp sv4cpio sv4crc svf svr swf t talk tar tbk tcl tcsh tex texi texinfo text tgz tif tif tiff tr tsi tsp tsv turbot txt uil uni unis unv uri uris ustar uu uue vcd vcs vda vdo vew viv vivo vmd vmf voc voc vos vox vqe vqf vql vrml vrt vsd vst vsw w60 w61 w6w wav wb1 wbmp web wiz wk1 wmf wml wmlc wmls wmlsc word wp wp5 wp6 wpd wq1 wri wrl wrz wsc wsrc wtk xbm xdr xgz xif xl xla xlb xlc xld xlk xll xlm xls xlt xlv xlv xlw xm xml xmz xpix xpm xpm x-png xsr xwd xwd xyz z zip zip zip zip zoo zsh');
 
 
   $errors = array();
@@ -1613,7 +1614,7 @@ function islandora_upload_get_by_file_id($fedora_pid) {
   }
   //update number of users because some of them may have been removed since they are admin level users
   $items_array['0']['number_of_users'] = $count_users;
-  // create a JSON object. The object will contain a property named “products” that will be set with the $items_array variable.
+  // create a JSON object. The object will contain a property named \93products\94 that will be set with the $items_array variable.
   echo json_encode($items_array);
   exit;
 }
